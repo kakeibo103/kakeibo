@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="かんたん家計簿">
+<link rel="manifest" href="manifest.webmanifest">
+<title>かんたん家計簿 第2号</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f4f6;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+.app{max-width:600px;margin:auto;min-height:100vh;background:#fff;padding-bottom:74px}
+header{background:#2563eb;color:#fff;padding:20px 18px 16px;position:sticky;top:0;z-index:3}
+h1{font-size:21px;margin:0}.sub{font-size:13px;opacity:.9;margin-top:5px}
+main{padding:14px}.screen{display:none}.screen.active{display:block}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:#fff;border-radius:15px;padding:15px;box-shadow:0 1px 5px #0001;border:1px solid #eee}
+.balance{grid-column:1/-1}.label{font-size:12px;color:#6b7280}.value{font-size:21px;font-weight:700;margin-top:5px}.blue{color:#2563eb}.red{color:#dc2626}.green{color:#059669}
+h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:0;border-radius:12px;padding:13px;font-size:15px;font-weight:700;background:#eef2ff;color:#1d4ed8}.primary{background:#2563eb;color:white;width:100%;margin-top:12px}
+input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;font-size:16px;background:#fff}label{font-size:12px;color:#4b5563;display:block;margin:10px 0 5px}
+.item{display:flex;justify-content:space-between;gap:8px;padding:13px 0;border-bottom:1px solid #eee}.item:last-child{border-bottom:0}
+.meta{font-size:12px;color:#6b7280;margin-top:3px}.amount{font-weight:700;white-space:nowrap}.empty{text-align:center;color:#9ca3af;padding:25px}
+.cat{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee;font-size:14px}
+.bar{height:9px;background:#e5e7eb;border-radius:99px;margin:5px 0 9px;overflow:hidden}.fill{height:100%;background:#2563eb}
+.nav{position:fixed;bottom:0;left:0;right:0;max-width:600px;margin:auto;background:#fff;border-top:1px solid #ddd;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 3px calc(7px + env(safe-area-inset-bottom));z-index:10}
+.nav button{border:0;background:white;color:#6b7280;font-size:11px;padding:5px 1px}.nav button.active{color:#2563eb;font-weight:700}.nav b{display:block;font-size:19px;margin-bottom:2px}
+textarea{width:100%;min-height:100px;border:1px solid #d1d5db;border-radius:10px;padding:10px;font-family:inherit}
+.small{font-size:12px;color:#6b7280}.danger{background:#fee2e2;color:#b91c1c}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>かんたん家計簿</h1><div class="sub" id="headerSub"></div></header>
+<main>
+<section id="home" class="screen active">
+<div class="summary">
+<div class="card"><div class="label">今月の収入</div><div class="value green" id="income">¥0</div></div>
+<div class="card"><div class="label">今月の支出</div><div class="value red" id="expense">¥0</div></div>
+<div class="card balance"><div class="label">今月の残り</div><div class="value blue" id="balance">¥0</div></div>
+</div>
+<h2>支出の内訳</h2><div class="card" id="homeCats"></div>
+<button class="btn primary" onclick="show('input')">＋ 支出を入力</button>
+</section>
+
+<section id="input" class="screen">
+<h2>支出・収入を入力</h2><div class="card">
+<label>種類</label><select id="type"><option value="expense">支出</option><option value="income">収入</option></select>
+<label>金額</label><input id="amount" type="number" inputmode="numeric" min="1" placeholder="例：5000">
+<label>カテゴリ</label><select id="category"><option>食費</option><option>日用品</option><option>住宅</option><option>光熱費</option><option>通信費</option><option>交通費</option><option>趣味</option><option>医療</option><option>給与</option><option>その他</option></select>
+<label>日付</label><input id="date" type="date">
+<label>内容</label><input id="note" placeholder="例：スーパー">
+<button class="btn primary" onclick="saveItem()">保存する</button>
+</div></section>
+
+<section id="history" class="screen">
+<h2>履歴</h2><div class="grid"><select id="period" onchange="render()"><option value="month">今月</option><option value="all">すべて</option></select><select id="filter" onchange="render()"><option value="all">全カテゴリ</option></select></div>
+<div class="card" style="margin-top:10px" id="historyList"></div>
+</section>
+
+<section id="analysis" class="screen">
+<h2>今月の分析</h2><div class="card"><div class="label">支出合計</div><div class="value red" id="analysisTotal">¥0</div><div id="analysisCats" style="margin-top:12px"></div></div>
+</section>
+
+<section id="assets" class="screen">
+<h2>資産管理</h2>
+<div class="grid"><button class="btn" onclick="changeAssetMonth(-1)">← 前月</button><button class="btn" onclick="changeAssetMonth(1)">翌月 →</button></div>
+<div class="card" style="margin-top:10px"><div class="label" id="assetMonthLabel">対象月</div><div class="value blue" id="assetTotal">¥0</div></div>
+<div class="card" style="margin-top:10px"><label>項目名</label><input id="assetName" placeholder="例：銀行口座"><label>残高</label><input id="assetAmount" type="number" inputmode="numeric" placeholder="例：500000"><button class="btn primary" onclick="saveAsset()">この月の資産を保存</button><div class="small" style="margin-top:8px">同じ項目を登録すると、その月の金額を更新します。</div></div>
+<h2>この月の資産</h2><div class="card" id="assetList"></div>
+<h2>資産推移</h2><div class="card" id="assetTrend"></div>
+</section>
+</main>
+<nav class="nav">
+<button onclick="show('home')" data-s="home" class="active"><b>🏠</b>ホーム</button>
+<button onclick="show('input')" data-s="input"><b>＋</b>入力</button>
+<button onclick="show('history')" data-s="history"><b>📋</b>履歴</button>
+<button onclick="show('analysis')" data-s="analysis"><b>📊</b>分析</button>
+<button onclick="show('assets')" data-s="assets"><b>💰</b>資産</button>
+</nav>
+</div>
+<script>
+const DATA='kakeibo_v2_data',ASSET='kakeibo_v2_assets';
+const $=id=>document.getElementById(id), yen=n=>'¥'+Number(n).toLocaleString('ja-JP');
+const now=new Date(), ym=now.toISOString().slice(0,7);
+let data=JSON.parse(localStorage.getItem(DATA)||'[]'),assets=JSON.parse(localStorage.getItem(ASSET)||'[]');
+let assetMonth=ym;
+$('date').value=now.toISOString().slice(0,10);
+function current(){return data.filter(x=>x.date.slice(0,7)===ym)}
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.s===id));render()}
+function saveItem(){
+ let amount=Number($('amount').value);if(!amount)return alert('金額を入力してください');
+ data.push({id:Date.now().toString(),type:$('type').value,amount,category:$('category').value,date:$('date').value,note:$('note').value.trim()});
+ localStorage.setItem(DATA,JSON.stringify(data));$('amount').value='';$('note').value='';show('home');
+}
+function del(id){data=data.filter(x=>x.id!==id);localStorage.setItem(DATA,JSON.stringify(data));render()}
+function changeAssetMonth(delta){
+ let d=new Date(assetMonth+'-01T00:00:00');d.setMonth(d.getMonth()+delta);assetMonth=d.toISOString().slice(0,7);render();
+}
+function saveAsset(){
+ let n=$('assetName').value.trim(),a=Number($('assetAmount').value);
+ if(!n||!a)return alert('項目名と残高を入力してください');
+ let existing=assets.find(x=>x.month===assetMonth&&x.name===n);
+ if(existing) existing.amount=a; else assets.push({id:Date.now().toString(),month:assetMonth,name:n,amount:a});
+ localStorage.setItem(ASSET,JSON.stringify(assets));$('assetName').value='';$('assetAmount').value='';render();
+}
+function delAsset(id){assets=assets.filter(x=>x.id!==id);localStorage.setItem(ASSET,JSON.stringify(assets));render()}
+function render(){
+ let c=current(),inc=c.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0),exp=c.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
+ $('headerSub').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月';
+ $('income').textContent=yen(inc);$('expense').textContent=yen(exp);$('balance').textContent=yen(inc-exp);
+ let cats={};c.filter(x=>x.type==='expense').forEach(x=>cats[x.category]=(cats[x.category]||0)+x.amount);
+ let entries=Object.entries(cats).sort((a,b)=>b[1]-a[1]);$('homeCats').innerHTML=entries.length?entries.map(([k,v])=>`<div class="cat"><span>${esc(k)}</span><b>${yen(v)}</b></div>`).join(''):'<div class="empty">まだ支出がありません</div>';
+ let opts=['<option value="all">全カテゴリ</option>'];[...new Set(data.map(x=>x.category))].sort().forEach(x=>opts.push(`<option>${esc(x)}</option>`));let old=$('filter').value;$('filter').innerHTML=opts.join('');if([...$('filter').options].some(o=>o.value===old))$('filter').value=old;
+ let list=data.slice().sort((a,b)=>b.date.localeCompare(a.date));if($('period').value==='month')list=list.filter(x=>x.date.slice(0,7)===ym);if($('filter').value!=='all')list=list.filter(x=>x.category===$('filter').value);
+ $('historyList').innerHTML=list.length?list.map(x=>`<div class="item"><div><b>${esc(x.note||x.category)}</b><div class="meta">${x.date} ・ ${esc(x.category)}</div></div><div><span class="amount ${x.type==='income'?'green':'red'}">${x.type==='income'?'+':'-'}${yen(x.amount)}</span><button class="btn" onclick="del('${x.id}')">削除</button></div></div>`).join(''):'<div class="empty">記録がありません</div>';
+ $('analysisTotal').textContent=yen(exp);let max=entries[0]?.[1]||1;$('analysisCats').innerHTML=entries.length?entries.map(([k,v])=>`<div class="cat"><span>${esc(k)}</span><b>${yen(v)}</b></div><div class="bar"><div class="fill" style="width:${v/max*100}%"></div></div>`).join(''):'<div class="empty">まだ分析できる支出がありません</div>';
+ let monthAssets=assets.filter(x=>x.month===assetMonth);
+let total=monthAssets.reduce((s,x)=>s+x.amount,0);
+let [ay,am]=assetMonth.split('-');$('assetMonthLabel').textContent=ay+'年'+Number(am)+'月の資産合計';$('assetTotal').textContent=yen(total);
+$('assetList').innerHTML=monthAssets.length?monthAssets.map(x=>`<div class="item"><b>${esc(x.name)}</b><div><span class="amount">${yen(x.amount)}</span><button class="btn" onclick="delAsset('${x.id}')">削除</button></div></div>`).join(''):'<div class="empty">この月の資産を登録してください</div>';
+let months=[...new Set(assets.map(x=>x.month))].sort();
+if(!months.includes(assetMonth)) months.push(assetMonth);
+months.sort();
+$('assetTrend').innerHTML=months.length?months.map(m=>{let t=assets.filter(x=>x.month===m).reduce((s,x)=>s+x.amount,0);let [yy,mm]=m.split('-');return `<div class="item"><span>${yy}年${Number(mm)}月</span><b>${yen(t)}</b></div>`}).join(''):'<div class="empty">まだ資産履歴がありません</div>';
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+render();
+</script>
+</body></html>
