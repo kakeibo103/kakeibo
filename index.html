@@ -161,7 +161,7 @@ let assetMonth=ym;
 let calendarMonth=ym;
 $('date').value=now.toISOString().slice(0,10);
 function current(){return data.filter(x=>x.date.slice(0,7)===ym)}
-function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.s===id));render()}
+function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.s===id));render();if(id==='calendar')renderCalendar()}
 
 const CATKEY='kakeibo_v2_categories';
 const DEFAULT_CATEGORIES=['食費','日用品','住宅','光熱費','通信費','交通費','趣味','医療','給与','その他'];
@@ -359,6 +359,6 @@ months.sort();
 $('assetTrend').innerHTML=months.length?months.map(m=>{let t=assets.filter(x=>x.month===m).reduce((s,x)=>s+x.amount,0);let [yy,mm]=m.split('-');return `<div class="item"><span>${yy}年${Number(mm)}月</span><b>${yen(t)}</b></div>`}).join(''):'<div class="empty">まだ資産履歴がありません</div>';
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
-renderCategories();render();
+renderCategories();render();renderCalendar();
 </script>
 </body></html>
