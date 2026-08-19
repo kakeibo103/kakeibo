@@ -27,7 +27,9 @@ input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px
 .nav button{border:0;background:white;color:#6b7280;font-size:11px;padding:5px 1px}.nav button.active{color:#2563eb;font-weight:700}.nav b{display:block;font-size:19px;margin-bottom:2px}
 textarea{width:100%;min-height:100px;border:1px solid #d1d5db;border-radius:10px;padding:10px;font-family:inherit}
 .small{font-size:12px;color:#6b7280}.danger{background:#fee2e2;color:#b91c1c}
-.danger{background:#fee2e2;color:#b91c1c}.small{font-size:12px;color:#6b7280}.category-row{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid #eee}\n</style>
+.small{font-size:12px;color:#6b7280}.danger{background:#fee2e2;color:#b91c1c}
+.category-row{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid #eee}
+</style>
 </head>
 <body>
 <div class="app">
@@ -44,21 +46,27 @@ textarea{width:100%;min-height:100px;border:1px solid #d1d5db;border-radius:10px
 </section>
 
 <section id="input" class="screen">
-<h2>支出・収入を入力</h2><div class="card">
-<label>種類</label><select id="type"><option value="expense">支出</option><option value="income">収入</option></select>
+<h2 id="inputTitle">支出・収入を入力</h2>
+<div class="card">
+<label>種類</label>
+<select id="type"><option value="expense">支出</option><option value="income">収入</option></select>
 <label>金額</label><input id="amount" type="number" inputmode="numeric" min="1" placeholder="例：5000">
-<label>カテゴリ</label><select id="category"><option>食費</option><option>日用品</option><option>住宅</option><option>光熱費</option><option>通信費</option><option>交通費</option><option>趣味</option><option>医療</option><option>給与</option><option>その他</option></select>
+<label>カテゴリ</label><select id="category"></select>
 <label>日付</label><input id="date" type="date">
 <label>内容</label><input id="note" placeholder="例：スーパー">
 <button class="btn primary" id="saveButton" onclick="saveItem()">保存する</button>
-<button class="btn" id="cancelEdit" onclick="startNewItem()" style="width:100%;margin-top:8px;display:none">編集をキャンセル</button>
+<button class="btn" id="cancelEdit" onclick="newItem()" style="width:100%;margin-top:8px;display:none">編集をキャンセル</button>
 </div>
 <h2>カテゴリ設定</h2>
 <div class="card">
-<div class="small">カテゴリ名を自由に追加・変更できます。変更すると過去の記録にも反映されます。</div>
-<div class="grid" style="margin-top:8px"><input id="newCategory" placeholder="新しいカテゴリ"><button class="btn" onclick="addCategory()">＋追加</button></div>
+<div class="small">カテゴリは自由に追加・変更できます。</div>
+<div class="grid" style="margin-top:8px">
+<input id="newCategory" placeholder="新しいカテゴリ">
+<button class="btn" onclick="addCategory()">＋追加</button>
+</div>
 <div id="categoryManager"></div>
-</div></section>
+</div>
+</section>
 
 <section id="history" class="screen">
 <h2>履歴</h2><div class="grid"><select id="period" onchange="render()"><option value="month">今月</option><option value="all">すべて</option></select><select id="filter" onchange="render()"><option value="all">全カテゴリ</option></select></div>
@@ -75,7 +83,10 @@ textarea{width:100%;min-height:100px;border:1px solid #d1d5db;border-radius:10px
 <button type="button" class="btn" onclick="changeAssetMonth(-1)">← 前月</button>
 <button type="button" class="btn" onclick="changeAssetMonth(1)">翌月 →</button>
 </div>
-<div class="card" style="margin-top:10px"><div class="label" id="assetMonthLabel">対象月</div><div class="value blue" id="assetTotal">¥0</div></div>
+<div class="card" style="margin-top:10px">
+<div class="label" id="assetMonthLabel"></div>
+<div class="value blue" id="assetTotal">¥0</div>
+</div>
 <div class="card" style="margin-top:10px">
 <label>項目名</label><input id="assetName" placeholder="例：銀行口座">
 <label>残高</label><input id="assetAmount" type="number" inputmode="numeric" placeholder="例：500000">
@@ -98,72 +109,132 @@ const DATA='kakeibo_v2_data',ASSET='kakeibo_v2_assets';
 const $=id=>document.getElementById(id), yen=n=>'¥'+Number(n).toLocaleString('ja-JP');
 const now=new Date(), ym=now.toISOString().slice(0,7);
 let data=JSON.parse(localStorage.getItem(DATA)||'[]'),assets=JSON.parse(localStorage.getItem(ASSET)||'[]');
-const CAT='kakeibo_v2_categories';
-const defaultCats=['食費','日用品','住宅','光熱費','通信費','交通費','趣味','医療','給与','その他'];
-let categories=JSON.parse(localStorage.getItem(CAT)||JSON.stringify(defaultCats));
-let assetMonth=ym, editingId=null;
+let assetMonth=ym;
 $('date').value=now.toISOString().slice(0,10);
 function current(){return data.filter(x=>x.date.slice(0,7)===ym)}
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.s===id));render()}
 
+const CATKEY='kakeibo_v2_categories';
+const DEFAULT_CATEGORIES=['食費','日用品','住宅','光熱費','通信費','交通費','趣味','医療','給与','その他'];
+let categories=JSON.parse(localStorage.getItem(CATKEY)||JSON.stringify(DEFAULT_CATEGORIES));
+let editingId=null;
+
 function renderCategories(){
- const selected=$('category').value;
- $('category').innerHTML=categories.map(c=>`<option>${esc(c)}</option>`).join('');
- if(categories.includes(selected))$('category').value=selected;
- $('categoryManager').innerHTML=categories.map((c,i)=>`<div class="category-row"><span>${esc(c)}</span><button class="btn" onclick="renameCategory(${i})">変更</button><button class="btn danger" onclick="deleteCategory(${i})">削除</button></div>`).join('');
+  const current=$('category').value;
+  $('category').innerHTML=categories.map(c=>'<option>'+esc(c)+'</option>').join('');
+  if(categories.includes(current)) $('category').value=current;
+  $('categoryManager').innerHTML=categories.map((c,i)=>
+    '<div class="category-row"><span>'+esc(c)+'</span>'+
+    '<button class="btn" onclick="renameCategory('+i+')">変更</button>'+
+    '<button class="btn danger" onclick="removeCategory('+i+')">削除</button></div>').join('');
 }
-function startNewItem(){
- editingId=null; $('saveButton').textContent='保存する'; $('cancelEdit').style.display='none';
- $('amount').value=''; $('note').value=''; $('date').value=new Date().toISOString().slice(0,10);
- renderCategories(); show('input');
+function newItem(){
+  editingId=null;
+  $('inputTitle').textContent='支出・収入を入力';
+  $('saveButton').textContent='保存する';
+  $('cancelEdit').style.display='none';
+  $('type').value='expense'; $('amount').value=''; $('note').value='';
+  $('date').value=new Date().toISOString().slice(0,10);
+  renderCategories();
 }
 function editItem(id){
- const x=data.find(v=>v.id===id); if(!x)return;
- editingId=id; $('saveButton').textContent='変更を保存'; $('cancelEdit').style.display='block';
- $('type').value=x.type; renderCategories(); $('category').value=x.category;
- $('amount').value=x.amount; $('date').value=x.date; $('note').value=x.note||''; show('input');
+  const x=data.find(v=>v.id===id); if(!x)return;
+  editingId=id;
+  $('inputTitle').textContent='記録を編集';
+  $('saveButton').textContent='変更を保存';
+  $('cancelEdit').style.display='block';
+  $('type').value=x.type; renderCategories(); $('category').value=x.category;
+  $('amount').value=x.amount; $('date').value=x.date; $('note').value=x.note||'';
+  show('input');
 }
 function addCategory(){
- const n=$('newCategory').value.trim(); if(!n)return alert('カテゴリ名を入力してください');
- if(categories.includes(n))return alert('同じカテゴリがあります');
- categories.push(n); localStorage.setItem(CAT,JSON.stringify(categories)); $('newCategory').value=''; render();
+  const n=$('newCategory').value.trim();
+  if(!n)return alert('カテゴリ名を入力してください');
+  if(categories.includes(n))return alert('同じカテゴリがあります');
+  categories.push(n); localStorage.setItem(CATKEY,JSON.stringify(categories));
+  $('newCategory').value=''; renderCategories();
 }
 function renameCategory(i){
- const old=categories[i], n=prompt('新しいカテゴリ名',old); if(n===null)return;
- const name=n.trim(); if(!name||name===old)return;
- if(categories.includes(name))return alert('同じカテゴリがあります');
- data.forEach(x=>{if(x.category===old)x.category=name});
- categories[i]=name; localStorage.setItem(CAT,JSON.stringify(categories)); localStorage.setItem(DATA,JSON.stringify(data)); render();
+  const old=categories[i], n=prompt('新しいカテゴリ名',old);
+  if(n===null)return;
+  const name=n.trim(); if(!name||name===old)return;
+  if(categories.includes(name))return alert('同じカテゴリがあります');
+  data.forEach(x=>{if(x.category===old)x.category=name});
+  categories[i]=name;
+  localStorage.setItem(CATKEY,JSON.stringify(categories));
+  localStorage.setItem(DATA,JSON.stringify(data));
+  render();
 }
-function deleteCategory(i){
- if(categories.length<=1)return alert('カテゴリは1つ以上必要です');
- const n=categories[i]; if(!confirm('「'+n+'」をカテゴリ一覧から削除しますか？\n過去の記録は残ります。'))return;
- categories.splice(i,1); localStorage.setItem(CAT,JSON.stringify(categories)); render();
+function removeCategory(i){
+  if(categories.length<=1)return alert('カテゴリは1つ以上必要です');
+  const n=categories[i];
+  if(!confirm('「'+n+'」をカテゴリ一覧から削除しますか？'))return;
+  categories.splice(i,1); localStorage.setItem(CATKEY,JSON.stringify(categories)); renderCategories();
 }
 
 function saveItem(){
- let amount=Number($('amount').value);if(!amount)return alert('金額を入力してください');
- const obj={type:$('type').value,amount,category:$('category').value,date:$('date').value,note:$('note').value.trim()};
- if(editingId){const i=data.findIndex(x=>x.id===editingId);if(i>=0)data[i]={...data[i],...obj};}
- else data.push({id:Date.now().toString(),...obj});
- localStorage.setItem(DATA,JSON.stringify(data));startNewItem();show('home');
+  const amount=Number($('amount').value);
+  if(!amount)return alert('金額を入力してください');
+  const obj={type:$('type').value,amount,category:$('category').value,date:$('date').value,note:$('note').value.trim()};
+  if(editingId){
+    const i=data.findIndex(x=>x.id===editingId);
+    if(i>=0)data[i]=Object.assign({},data[i],obj);
+  }else{
+    data.push(Object.assign({id:String(Date.now())},obj));
+  }
+  localStorage.setItem(DATA,JSON.stringify(data));
+  newItem(); show('home');
 }
-function del(id){if(!confirm('この記録を削除しますか？'))return;data=data.filter(x=>x.id!==id);localStorage.setItem(DATA,JSON.stringify(data));render()}
-function changeAssetMonth(delta){
- let d=new Date(assetMonth+'-01T00:00:00');d.setMonth(d.getMonth()+delta);assetMonth=d.toISOString().slice(0,7);render();
+function del(id){
+  if(!confirm('この記録を削除しますか？'))return;
+  data=data.filter(x=>x.id!==id); localStorage.setItem(DATA,JSON.stringify(data)); render();
 }
+
 function saveAsset(){
- let n=$('assetName').value.trim(),a=Number($('assetAmount').value);if(!n||!a)return alert('項目名と残高を入力してください');
- let e=assets.find(x=>x.month===assetMonth&&x.name===n);if(e)e.amount=a;else assets.push({id:Date.now().toString(),month:assetMonth,name:n,amount:a});
- localStorage.setItem(ASSET,JSON.stringify(assets));$('assetName').value='';$('assetAmount').value='';render();
+  const n=$('assetName').value.trim(), a=Number($('assetAmount').value);
+  if(!n||!a)return alert('項目名と残高を入力してください');
+  const old=assets.find(x=>x.month===assetMonth&&x.name===n);
+  if(old)old.amount=a; else assets.push({id:String(Date.now()),month:assetMonth,name:n,amount:a});
+  localStorage.setItem(ASSET,JSON.stringify(assets));
+  $('assetName').value=''; $('assetAmount').value=''; render();
 }
 function editAsset(id){
- let x=assets.find(v=>v.id===id);if(!x)return;let n=prompt('項目名',x.name);if(n===null)return;let a=prompt('残高',x.amount);if(a===null||!Number(a))return;x.name=n.trim();x.amount=Number(a);localStorage.setItem(ASSET,JSON.stringify(assets));render();
+  const x=assets.find(v=>v.id===id); if(!x)return;
+  const n=prompt('項目名',x.name); if(n===null)return;
+  const name=n.trim(); if(!name)return;
+  const a=prompt('残高',String(x.amount)); if(a===null)return;
+  const amount=Number(a); if(!amount)return;
+  x.name=name; x.amount=amount;
+  localStorage.setItem(ASSET,JSON.stringify(assets)); render();
 }
-function delAsset(id){if(!confirm('この月の資産記録を削除しますか？'))return;assets=assets.filter(x=>x.id!==id);localStorage.setItem(ASSET,JSON.stringify(assets));render();}
+function delAsset(id){
+  if(!confirm('この月の資産記録を削除しますか？'))return;
+  assets=assets.filter(x=>x.id!==id); localStorage.setItem(ASSET,JSON.stringify(assets)); render();
+}
 function changeAssetMonth(delta){
- let d=new Date(assetMonth+'-01T00:00:00');d.setMonth(d.getMonth()+delta);
- assetMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');render();
+  const parts=assetMonth.split('-').map(Number);
+  const d=new Date(parts[0],parts[1]-1+delta,1);
+  assetMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  render();
+}
+function render(){
+ let c=current(),inc=c.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0),exp=c.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
+ $('headerSub').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月';
+ $('income').textContent=yen(inc);$('expense').textContent=yen(exp);$('balance').textContent=yen(inc-exp);
+ let cats={};c.filter(x=>x.type==='expense').forEach(x=>cats[x.category]=(cats[x.category]||0)+x.amount);
+ let entries=Object.entries(cats).sort((a,b)=>b[1]-a[1]);$('homeCats').innerHTML=entries.length?entries.map(([k,v])=>`<div class="cat"><span>${esc(k)}</span><b>${yen(v)}</b></div>`).join(''):'<div class="empty">まだ支出がありません</div>';
+ let opts=['<option value="all">全カテゴリ</option>'];[...new Set(data.map(x=>x.category))].sort().forEach(x=>opts.push(`<option>${esc(x)}</option>`));let old=$('filter').value;$('filter').innerHTML=opts.join('');if([...$('filter').options].some(o=>o.value===old))$('filter').value=old;
+ let list=data.slice().sort((a,b)=>b.date.localeCompare(a.date));if($('period').value==='month')list=list.filter(x=>x.date.slice(0,7)===ym);if($('filter').value!=='all')list=list.filter(x=>x.category===$('filter').value);
+ $('historyList').innerHTML=list.length?list.map(x=>`<div class="item"><div><b>${esc(x.note||x.category)}</b><div class="meta">${x.date} ・ ${esc(x.category)}</div></div><div><span class="amount ${x.type==='income'?'green':'red'}">${x.type==='income'?'+':'-'}${yen(x.amount)}</span><button class="btn" onclick="editItem('${x.id}')">編集</button><button class="btn danger" onclick="del('${x.id}')">削除</button></div></div>`).join(''):'<div class="empty">記録がありません</div>';
+ $('analysisTotal').textContent=yen(exp);let max=entries[0]?.[1]||1;$('analysisCats').innerHTML=entries.length?entries.map(([k,v])=>`<div class="cat"><span>${esc(k)}</span><b>${yen(v)}</b></div><div class="bar"><div class="fill" style="width:${v/max*100}%"></div></div>`).join(''):'<div class="empty">まだ分析できる支出がありません</div>';
+ let monthAssets=assets.filter(x=>x.month===assetMonth);
+let total=monthAssets.reduce((s,x)=>s+x.amount,0);
+let [ay,am]=assetMonth.split('-');$('assetMonthLabel').textContent=ay+'年'+Number(am)+'月の資産合計';$('assetTotal').textContent=yen(total);
+$('assetList').innerHTML=monthAssets.length?monthAssets.map(x=>`<div class="item"><b>${esc(x.name)}</b><div><span class="amount">${yen(x.amount)}</span><button class="btn" onclick="editAsset('${x.id}')">編集</button><button class="btn danger" onclick="delAsset('${x.id}')">削除</button></div></div>`).join(''):'<div class="empty">この月の資産を登録してください</div>';
+let months=[...new Set(assets.map(x=>x.month))].sort();
+if(!months.includes(assetMonth)) months.push(assetMonth);
+months.sort();
+$('assetTrend').innerHTML=months.length?months.map(m=>{let t=assets.filter(x=>x.month===m).reduce((s,x)=>s+x.amount,0);let [yy,mm]=m.split('-');return `<div class="item"><span>${yy}年${Number(mm)}月</span><b>${yen(t)}</b></div>`}).join(''):'<div class="empty">まだ資産履歴がありません</div>';
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 renderCategories();render();
