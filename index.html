@@ -3,32 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#2563eb">
+<meta name="theme-color" content="#a8b99a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="かんたん家計簿">
 <link rel="manifest" href="manifest.webmanifest">
 <title>かんたん家計簿 第2号</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f3f4f6;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
-.app{max-width:600px;margin:auto;min-height:100vh;background:#fff;padding-bottom:74px}
-header{background:#2563eb;color:#fff;padding:20px 18px 16px;position:sticky;top:0;z-index:3}
-h1{font-size:21px;margin:0}.sub{font-size:13px;opacity:.9;margin-top:5px}
+*{box-sizing:border-box}
+body{margin:0;background:#eee8da;color:#3f463d;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+.app{max-width:600px;margin:auto;min-height:100vh;background:#f8f5ec;padding-bottom:78px}
+header{background:#a8b99a;color:#fff;padding:18px 18px 15px;position:sticky;top:0;z-index:3;box-shadow:0 1px 4px #5d674b22}
+h1{font-size:21px;margin:0}.sub{font-size:13px;opacity:.95;margin-top:5px}
 main{padding:14px}.screen{display:none}.screen.active{display:block}
-.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:#fff;border-radius:15px;padding:15px;box-shadow:0 1px 5px #0001;border:1px solid #eee}
-.balance{grid-column:1/-1}.label{font-size:12px;color:#6b7280}.value{font-size:21px;font-weight:700;margin-top:5px}.blue{color:#2563eb}.red{color:#dc2626}.green{color:#059669}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:#fffdf8;border-radius:15px;padding:15px;box-shadow:0 1px 5px #6d6b5a18;border:1px solid #e8e1d3}
+.balance{grid-column:1/-1}.label{font-size:12px;color:#7a8175}.value{font-size:21px;font-weight:700;margin-top:5px}
+.blue{color:#687f92}.red{color:#a66d68}.green{color:#6f8c6a}
 h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn{border:0;border-radius:12px;padding:13px;font-size:15px;font-weight:700;background:#eef2ff;color:#1d4ed8}.primary{background:#2563eb;color:white;width:100%;margin-top:12px}
-input,select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;font-size:16px;background:#fff}label{font-size:12px;color:#4b5563;display:block;margin:10px 0 5px}
-.item{display:flex;justify-content:space-between;gap:8px;padding:13px 0;border-bottom:1px solid #eee}.item:last-child{border-bottom:0}
-.meta{font-size:12px;color:#6b7280;margin-top:3px}.amount{font-weight:700;white-space:nowrap}.empty{text-align:center;color:#9ca3af;padding:25px}
-.cat{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee;font-size:14px}
-.bar{height:9px;background:#e5e7eb;border-radius:99px;margin:5px 0 9px;overflow:hidden}.fill{height:100%;background:#2563eb}
-.nav{position:fixed;bottom:0;left:0;right:0;max-width:600px;margin:auto;background:#fff;border-top:1px solid #ddd;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 3px calc(7px + env(safe-area-inset-bottom));z-index:10}
-.nav button{border:0;background:white;color:#6b7280;font-size:11px;padding:5px 1px}.nav button.active{color:#2563eb;font-weight:700}.nav b{display:block;font-size:19px;margin-bottom:2px}
-textarea{width:100%;min-height:100px;border:1px solid #d1d5db;border-radius:10px;padding:10px;font-family:inherit}
-.small{font-size:12px;color:#6b7280}.danger{background:#fee2e2;color:#b91c1c}
-.small{font-size:12px;color:#6b7280}.danger{background:#fee2e2;color:#b91c1c}
-.category-row{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid #eee}
+.btn{border:0;border-radius:12px;padding:13px;font-size:15px;font-weight:700;background:#e8eee2;color:#63755b}
+.primary{background:#a8b99a;color:#fff;width:100%;margin-top:12px}
+input,select{width:100%;padding:12px;border:1px solid #d9d3c6;border-radius:10px;font-size:16px;background:#fffdf8;color:#3f463d}
+label{font-size:12px;color:#687064;display:block;margin:10px 0 5px}
+.item{display:flex;justify-content:space-between;gap:8px;padding:13px 0;border-bottom:1px solid #eee8dc}.item:last-child{border-bottom:0}
+.meta{font-size:12px;color:#8a9085;margin-top:3px}.amount{font-weight:700;white-space:nowrap}.empty{text-align:center;color:#aaa99f;padding:25px}
+.cat{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee8dc;font-size:14px}
+.bar{height:9px;background:#e6e2d8;border-radius:99px;margin:5px 0 9px;overflow:hidden}.fill{height:100%;background:#a8b99a}
+.nav{position:fixed;bottom:0;left:0;right:0;max-width:600px;margin:auto;background:#fffdf8;border-top:1px solid #ded8ca;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 3px calc(7px + env(safe-area-inset-bottom));z-index:10}
+.nav button{border:0;background:#fffdf8;color:#8b9088;font-size:11px;padding:5px 1px}.nav button.active{color:#6f8665;font-weight:700}.nav b{display:block;font-size:19px;margin-bottom:2px}
+textarea{width:100%;min-height:100px;border:1px solid #d9d3c6;border-radius:10px;padding:10px;font-family:inherit}
+.small{font-size:12px;color:#7d8479}.danger{background:#f3dfdc;color:#a05d58}
+.category-row{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid #eee8dc}
+
+/* calendar */
+.calendar-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.calendar-title{font-size:19px;font-weight:700}
+.month-btn{border:0;background:#e8eee2;color:#65775c;border-radius:10px;padding:9px 12px;font-weight:700}
+.calendar-card{background:#fffdf8;border:1px solid #e8e1d3;border-radius:16px;padding:10px;box-shadow:0 1px 5px #6d6b5a18}
+.weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.weekdays div{text-align:center;font-size:11px;color:#92978d;padding:6px 0}
+.day{min-width:0;min-height:72px;border:1px solid #eee9df;border-radius:9px;margin:2px;padding:5px;background:#fffefa;cursor:pointer}
+.day.other{opacity:.42;background:#f5f1e8}
+.day.today{outline:2px solid #b7c7aa}
+.daynum{font-size:12px;font-weight:700}
+.day.income{background:#eef3e9}.day.expense{background:#f5ebe6}
+.day-balance{font-size:11px;font-weight:700;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day-count{font-size:9px;color:#8a9085;margin-top:3px}
+.cal-legend{display:flex;gap:12px;font-size:11px;color:#7e847a;margin-top:10px;justify-content:center}
+.legend-dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:middle;margin-right:3px}
 </style>
 </head>
 <body>
@@ -82,8 +103,26 @@ textarea{width:100%;min-height:100px;border:1px solid #d1d5db;border-radius:10px
 <div class="card" style="margin-top:10px" id="historyList"></div>
 </section>
 
-<section id="analysis" class="screen">
-<h2>今月の分析</h2><div class="card"><div class="label">支出合計</div><div class="value red" id="analysisTotal">¥0</div><div id="analysisCats" style="margin-top:12px"></div></div>
+
+<section id="calendar" class="screen">
+<h2>カレンダー</h2>
+<div class="calendar-head">
+<button class="month-btn" onclick="changeCalendarMonth(-1)">‹ 前月</button>
+<div class="calendar-title" id="calendarMonthLabel"></div>
+<button class="month-btn" onclick="changeCalendarMonth(1)">翌月 ›</button>
+</div>
+<div class="calendar-card">
+<div class="weekdays"><div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div></div>
+<div class="calendar-grid" id="calendarGrid"></div>
+</div>
+<div class="cal-legend">
+<span><i class="legend-dot" style="background:#f0dcd5"></i>支出</span>
+<span><i class="legend-dot" style="background:#dce9d5"></i>収入</span>
+</div>
+<div class="card" style="margin-top:10px">
+<div class="label" id="calendarSummary"></div>
+<div class="value" id="calendarSummaryValue">¥0</div>
+</div>
 </section>
 
 <section id="assets" class="screen">
@@ -109,7 +148,7 @@ textarea{width:100%;min-height:100px;border:1px solid #d1d5db;border-radius:10px
 <button onclick="show('home')" data-s="home" class="active"><b>🏠</b>ホーム</button>
 <button onclick="show('input')" data-s="input"><b>＋</b>入力</button>
 <button onclick="show('history')" data-s="history"><b>📋</b>履歴</button>
-<button onclick="show('analysis')" data-s="analysis"><b>📊</b>分析</button>
+<button onclick="show('calendar')" data-s="calendar"><b>📅</b>カレンダー</button>
 <button onclick="show('assets')" data-s="assets"><b>💰</b>資産</button>
 </nav>
 </div>
@@ -119,6 +158,7 @@ const $=id=>document.getElementById(id), yen=n=>'¥'+Number(n).toLocaleString('j
 const now=new Date(), ym=now.toISOString().slice(0,7);
 let data=JSON.parse(localStorage.getItem(DATA)||'[]'),assets=JSON.parse(localStorage.getItem(ASSET)||'[]');
 let assetMonth=ym;
+let calendarMonth=ym;
 $('date').value=now.toISOString().slice(0,10);
 function current(){return data.filter(x=>x.date.slice(0,7)===ym)}
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.s===id));render()}
@@ -227,6 +267,51 @@ function changeAssetMonth(delta){
   render();
 }
 
+
+function changeCalendarMonth(delta){
+  const p=calendarMonth.split('-').map(Number);
+  const d=new Date(p[0],p[1]-1+delta,1);
+  calendarMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  renderCalendar();
+}
+function renderCalendar(){
+  const [y,m]=calendarMonth.split('-').map(Number);
+  $('calendarMonthLabel').textContent=y+'年'+m+'月';
+  const first=new Date(y,m-1,1);
+  const start=new Date(y,m-1,1-first.getDay());
+  let out='';
+  for(let i=0;i<42;i++){
+    const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i);
+    const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const monthKey=ds.slice(0,7);
+    const items=data.filter(x=>x.date===ds);
+    const exp=items.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
+    const inc=items.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0);
+    const net=inc-exp;
+    let cls='day';
+    if(monthKey!==calendarMonth)cls+=' other';
+    if(ds===new Date().toISOString().slice(0,10))cls+=' today';
+    if(exp&&!inc)cls+=' expense';
+    if(inc&&!exp)cls+=' income';
+    if(exp&&inc)cls+=' expense';
+    const amount=net===0?'':(net>0?'+':'-')+yen(Math.abs(net));
+    out+=`<div class="${cls}" onclick="showDay('${ds}')"><div class="daynum">${d.getDate()}</div>${amount?`<div class="day-balance ${net>0?'green':net<0?'red':''}">${amount}</div>`:''}${items.length?`<div class="day-count">${items.length}件</div>`:''}</div>`;
+  }
+  $('calendarGrid').innerHTML=out;
+  const monthItems=data.filter(x=>x.date.slice(0,7)===calendarMonth);
+  const exp=monthItems.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
+  const inc=monthItems.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0);
+  $('calendarSummary').textContent=calendarMonth.replace('-','年')+'月の収支';
+  $('calendarSummaryValue').textContent=(inc-exp>=0?'+':'-')+yen(Math.abs(inc-exp));
+}
+function showDay(ds){
+  const items=data.filter(x=>x.date===ds);
+  if(!items.length){ $('date').value=ds; show('input'); return; }
+  const label=ds.replace(/-/g,'/');
+  const lines=items.map(x=>(x.type==='income'?'+':'-')+yen(x.amount)+'　'+(x.note||x.category)).join('\n');
+  alert(label+'\n\n'+lines);
+}
+
 function backupData(){
  const payload={app:"kakeibo",version:"2.3",exportedAt:new Date().toISOString(),data:data,assets:assets,categories:categories};
  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
@@ -248,7 +333,7 @@ function restoreData(event){
    localStorage.setItem(DATA,JSON.stringify(data));
    localStorage.setItem(ASSET,JSON.stringify(assets));
    localStorage.setItem(CATKEY,JSON.stringify(categories));
-   renderCategories();render();alert("データを復元しました。");
+   renderCategories();render();renderCalendar();alert("データを復元しました。");
   }catch(e){alert("バックアップファイルを読み込めませんでした。家計簿から作成したJSONファイルを選んでください。");}
   finally{event.target.value="";}
  };
@@ -264,7 +349,6 @@ function render(){
  let opts=['<option value="all">全カテゴリ</option>'];[...new Set(data.map(x=>x.category))].sort().forEach(x=>opts.push(`<option>${esc(x)}</option>`));let old=$('filter').value;$('filter').innerHTML=opts.join('');if([...$('filter').options].some(o=>o.value===old))$('filter').value=old;
  let list=data.slice().sort((a,b)=>b.date.localeCompare(a.date));if($('period').value==='month')list=list.filter(x=>x.date.slice(0,7)===ym);if($('filter').value!=='all')list=list.filter(x=>x.category===$('filter').value);
  $('historyList').innerHTML=list.length?list.map(x=>`<div class="item"><div><b>${esc(x.note||x.category)}</b><div class="meta">${x.date} ・ ${esc(x.category)}</div></div><div><span class="amount ${x.type==='income'?'green':'red'}">${x.type==='income'?'+':'-'}${yen(x.amount)}</span><button class="btn" onclick="editItem('${x.id}')">編集</button><button class="btn danger" onclick="del('${x.id}')">削除</button></div></div>`).join(''):'<div class="empty">記録がありません</div>';
- $('analysisTotal').textContent=yen(exp);let max=entries[0]?.[1]||1;$('analysisCats').innerHTML=entries.length?entries.map(([k,v])=>`<div class="cat"><span>${esc(k)}</span><b>${yen(v)}</b></div><div class="bar"><div class="fill" style="width:${v/max*100}%"></div></div>`).join(''):'<div class="empty">まだ分析できる支出がありません</div>';
  let monthAssets=assets.filter(x=>x.month===assetMonth);
 let total=monthAssets.reduce((s,x)=>s+x.amount,0);
 let [ay,am]=assetMonth.split('-');$('assetMonthLabel').textContent=ay+'年'+Number(am)+'月の資産合計';$('assetTotal').textContent=yen(total);
