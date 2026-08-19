@@ -66,6 +66,15 @@ textarea{width:100%;min-height:100px;border:1px solid #d1d5db;border-radius:10px
 </div>
 <div id="categoryManager"></div>
 </div>
+
+<h2>データ管理</h2>
+<div class="card">
+<div class="small">家計簿のデータをファイルに保存できます。機種変更や万一のデータ消失に備えて、定期的にバックアップしてください。</div>
+<button class="btn primary" onclick="backupData()" style="width:100%;margin-top:10px">📥 データをバックアップ</button>
+<label style="margin-top:12px">バックアップから復元</label>
+<input id="restoreFile" type="file" accept=".json,application/json" onchange="restoreData(event)">
+<div class="small" style="margin-top:6px">※復元すると現在のデータはバックアップの内容に置き換わります。</div>
+</div>
 </section>
 
 <section id="history" class="screen">
@@ -217,6 +226,35 @@ function changeAssetMonth(delta){
   assetMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
   render();
 }
+
+function backupData(){
+ const payload={app:"kakeibo",version:"2.3",exportedAt:new Date().toISOString(),data:data,assets:assets,categories:categories};
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a"),d=new Date();
+ const stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")+"_"+String(d.getHours()).padStart(2,"0")+String(d.getMinutes()).padStart(2,"0");
+ a.href=url;a.download="kakeibo_backup_"+stamp+".json";document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function restoreData(event){
+ const file=event.target.files&&event.target.files[0];if(!file)return;
+ const reader=new FileReader();
+ reader.onload=function(){
+  try{
+   const p=JSON.parse(reader.result);
+   if(!p||!Array.isArray(p.data)||!Array.isArray(p.assets))throw new Error();
+   if(!confirm("現在の家計簿データを、このバックアップで置き換えます。よろしいですか？"))return;
+   data=p.data;assets=p.assets;
+   if(Array.isArray(p.categories)&&p.categories.length)categories=p.categories;
+   localStorage.setItem(DATA,JSON.stringify(data));
+   localStorage.setItem(ASSET,JSON.stringify(assets));
+   localStorage.setItem(CATKEY,JSON.stringify(categories));
+   renderCategories();render();alert("データを復元しました。");
+  }catch(e){alert("バックアップファイルを読み込めませんでした。家計簿から作成したJSONファイルを選んでください。");}
+  finally{event.target.value="";}
+ };
+ reader.readAsText(file);
+}
+
 function render(){
  let c=current(),inc=c.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0),exp=c.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
  $('headerSub').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月';
