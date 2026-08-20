@@ -1,9 +1,10 @@
 {
-  "name":"かんたん家計簿 第3号",
+  "name":"スマート家計簿",
   "short_name":"家計簿",
   "start_url":"./",
   "display":"standalone",
   "background_color":"#f8f5ec",
   "theme_color":"#a8b99a",
-  "lang":"ja"
+  "lang":"ja",
+  "icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
 }
