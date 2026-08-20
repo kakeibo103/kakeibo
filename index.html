@@ -13,6 +13,15 @@
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.app{max-width:600px;margin:auto;min-height:100vh;background:#f8f5ec;padding-bottom:78px}header{background:var(--theme);color:#fff;padding:15px 16px;position:sticky;top:0;z-index:20;box-shadow:0 1px 5px #5d674b22;display:flex;align-items:center;justify-content:space-between}h1{font-size:21px;margin:0}.sub{font-size:12px;opacity:.95;margin-top:4px}.head-title{min-width:0}.gear{border:0;background:#ffffff22;color:#fff;border-radius:11px;font-size:20px;width:40px;height:40px}.screen{display:none}.screen.active{display:block}main{padding:14px}.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:var(--surface);border-radius:15px;padding:15px;box-shadow:0 1px 5px var(--shadow);border:1px solid var(--border)}.balance{grid-column:1/-1}.label{font-size:12px;color:var(--muted)}.value{font-size:21px;font-weight:700;margin-top:5px}.blue{color:#687f92}.red{color:var(--expense)}.green{color:var(--income)}h2{font-size:17px;margin:20px 2px 10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:0;border-radius:12px;padding:11px 12px;font-size:14px;font-weight:700;background:var(--theme-soft);color:var(--theme-dark)}.primary{background:var(--theme);color:#fff;width:100%;margin-top:12px}input,select{width:100%;padding:12px;border:1px solid #d9d3c6;border-radius:10px;font-size:16px;background:var(--surface);color:var(--text)}label{font-size:12px;color:#687064;display:block;margin:10px 0 5px}.item{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid #eee8dc}.item:last-child{border-bottom:0}.meta{font-size:12px;color:#8a9085;margin-top:3px}.amount{font-weight:700;white-space:nowrap}.empty{text-align:center;color:#aaa99f;padding:25px}.cat{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee8dc;font-size:14px}.bar{height:9px;background:#e6e2d8;border-radius:99px;margin:5px 0 9px;overflow:hidden}.fill{height:100%;background:var(--theme)}.nav{position:fixed;bottom:0;left:0;right:0;max-width:600px;margin:auto;background:var(--surface);border-top:1px solid #ded8ca;display:grid;grid-template-columns:repeat(5,1fr);padding:7px 3px calc(7px + env(safe-area-inset-bottom));z-index:30}.nav button{border:0;background:var(--surface);color:#8b9088;font-size:11px;padding:5px 1px}.nav button.active{color:var(--theme-dark);font-weight:700}.nav b{display:block;font-size:19px;margin-bottom:2px}textarea{width:100%;min-height:100px;border:1px solid #d9d3c6;border-radius:10px;padding:10px;font-family:inherit}.small{font-size:12px;color:#7d8479}.danger{background:#f3dfdc;color:#a05d58}.category-row{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid #eee8dc}
 .calendar-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.calendar-title{font-size:19px;font-weight:700}.month-btn{border:0;background:var(--theme-soft);color:var(--theme-dark);border-radius:10px;padding:9px 12px;font-weight:700}.calendar-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:8px;box-shadow:0 1px 5px var(--shadow)}.weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr)}.weekdays div{text-align:center;font-size:11px;color:#92978d;padding:6px 0}.day{min-width:0;min-height:72px;border:1px solid #eee9df;border-radius:9px;margin:2px;padding:5px;background:#fffefa;cursor:pointer}.day.other{opacity:.42;background:#f5f1e8}.day.today{outline:2px solid var(--theme)}.daynum{font-size:12px;font-weight:700}.day.income{background:#eef3e9}.day.expense{background:#f5ebe6}.day-balance{font-size:11px;font-weight:800;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.day-count{font-size:9px;color:#8a9085;margin-top:3px}.cal-legend{display:flex;gap:12px;font-size:11px;color:#7e847a;margin-top:10px;justify-content:center}.legend-dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:middle;margin-right:3px}.day-detail{margin-top:12px;display:none}.day-detail.show{display:block}.detail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}.detail-date{font-size:16px;font-weight:800}.detail-close{border:0;background:var(--theme-soft);color:var(--theme-dark);border-radius:9px;padding:6px 9px}.detail-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.detail-actions button{margin:0}.chart-wrap{display:flex;gap:15px;align-items:center}.pie{width:155px;height:155px;border-radius:50%;position:relative;flex:none}.pie:after{content:"";position:absolute;inset:38px;border-radius:50%;background:var(--surface)}.legend-list{flex:1;min-width:0}.legend-row{display:grid;grid-template-columns:12px 1fr auto;gap:7px;align-items:center;padding:6px 0;font-size:12px}.legend-color{width:10px;height:10px;border-radius:50%}.legend-row b{white-space:nowrap}.chart-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}.chart-toggle button.active{background:var(--theme);color:#fff}.asset-chart{width:100%;height:190px}.asset-chart svg{width:100%;height:190px;overflow:visible}.asset-chart text{font-family:inherit;fill:#7b8178;font-size:10px}.settings-option{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.swatch{border:2px solid transparent;border-radius:12px;padding:10px 5px;background:#fff;cursor:pointer}.swatch.active{border-color:#3f463d}.swatch i{display:block;width:30px;height:30px;border-radius:50%;margin:0 auto 5px}.theme-note{font-size:12px;color:#7b8178;margin-top:8px}.setting-row{padding:12px 0;border-bottom:1px solid #eee8dc}.setting-row:last-child{border-bottom:0}
 @media(max-width:380px){.day{min-height:64px;padding:4px}.day-balance{font-size:10px}.chart-wrap{gap:10px}.pie{width:130px;height:130px}.pie:after{inset:32px}.legend-row{font-size:11px}}
+
+.history-actions{display:flex;align-items:center;gap:4px;flex-wrap:nowrap;justify-content:flex-end}
+.history-actions .amount{margin-right:2px}
+.history-actions .btn{padding:6px 8px;font-size:11px;border-radius:9px;line-height:1}
+.asset-latest{margin-top:8px;padding-top:8px;border-top:1px solid #eee8dc}
+.asset-latest .value{font-size:24px}
+.day-balance{font-size:11px;font-weight:700;margin-top:7px;white-space:nowrap;overflow:visible;text-overflow:clip;line-height:1.05}
+.day-count{font-size:9px;color:#8a9085;margin-top:4px}
+@media(max-width:380px){.day{min-height:68px;padding:4px}.day-balance{font-size:10px}.history-actions .btn{padding:5px 6px;font-size:10px}}
 </style>
 </head>
 <body>
@@ -118,6 +127,10 @@
 <div class="card" style="margin-top:10px">
 <div class="label" id="assetMonthLabel"></div>
 <div class="value blue" id="assetTotal">¥0</div>
+<div class="asset-latest">
+<div class="label" id="assetLatestLabel">最新の総資産</div>
+<div class="value green" id="assetLatestTotal">¥0</div>
+</div>
 </div>
 <div class="card" style="margin-top:10px">
 <label>項目名</label><input id="assetName" placeholder="例：銀行口座">
@@ -139,6 +152,7 @@
 <script>
 const DATA='kakeibo_v2_data',ASSET='kakeibo_v2_assets';
 const $=id=>document.getElementById(id), yen=n=>'¥'+Number(n).toLocaleString('ja-JP');
+const compactYen=n=>{n=Number(n);const s=n<0?'−':'+';const a=Math.abs(n);if(a>=1000000)return s+'¥'+(a/1000000).toFixed(1).replace('.0','')+'万';if(a>=10000)return s+'¥'+(a/10000).toFixed(1).replace('.0','')+'万';return s+'¥'+a.toLocaleString('ja-JP');};
 const now=new Date(), ym=now.toISOString().slice(0,7);
 let data=JSON.parse(localStorage.getItem(DATA)||'[]'),assets=JSON.parse(localStorage.getItem(ASSET)||'[]');
 let assetMonth=ym;
@@ -281,7 +295,7 @@ function renderCalendar(){
     if(exp&&!inc)cls+=' expense';
     if(inc&&!exp)cls+=' income';
     if(exp&&inc)cls+=' expense';
-    const amount=net===0?'':(net>0?'+':'-')+yen(Math.abs(net));
+    const amount=net===0?'':compactYen(net);
     out+=`<div class="${cls}" onclick="showDay('${ds}')"><div class="daynum">${d.getDate()}</div>${amount?`<div class="day-balance ${net>0?'green':net<0?'red':''}">${amount}</div>`:''}${items.length?`<div class="day-count">${items.length}件</div>`:''}</div>`;
   }
   $('calendarGrid').innerHTML=out;
@@ -301,7 +315,7 @@ function showDay(ds){
   box.classList.add('show');
   box.innerHTML='<div class="detail-head"><div class="detail-date">'+label+'</div><button class="detail-close" onclick="closeDayDetail()">閉じる</button></div>'+
     '<div class="small">支出 '+yen(exp)+'　・　収入 '+yen(inc)+'　・　収支 '+yen(inc-exp)+'</div>'+
-    (items.length?items.map(x=>'<div class="item"><div><b>'+esc(x.note||x.category)+'</b><div class="meta">'+esc(x.category)+'</div></div><div><span class="amount '+(x.type==='income'?'green':'red')+'">'+(x.type==='income'?'+':'-')+yen(x.amount)+'</span><button class="btn" onclick="editItem(\''+x.id+'\')">編集</button><button class="btn danger" onclick="del(\''+x.id+'\')">削除</button></div></div>').join(''):'<div class="empty">この日の記録はありません</div>')+
+    (items.length?items.map(x=>'<div class="item"><div><b>'+esc(x.note||x.category)+'</b><div class="meta">'+esc(x.category)+'</div></div><div class="history-actions"><span class="amount '+(x.type==='income'?'green':'red')+'">'+(x.type==='income'?'+':'-')+yen(x.amount)+'</span><button class="btn" onclick="editItem(\''+x.id+'\')">編集</button><button class="btn danger" onclick="del(\''+x.id+'\')">削除</button></div></div>').join(''):'<div class="empty">この日の記録はありません</div>')+
     '<div class="detail-actions"><button class="btn primary" onclick="addFromCalendar(\''+ds+'\',\'expense\')">＋ 支出を追加</button><button class="btn" onclick="addFromCalendar(\''+ds+'\',\'income\')">＋ 収入を追加</button></div>';
   document.getElementById('dayDetail').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -375,10 +389,15 @@ function render(){
  let entries=Object.entries(cats).sort((a,b)=>b[1]-a[1]);$('homeCats').innerHTML=entries.length?entries.map(([k,v])=>`<div class="cat"><span>${esc(k)}</span><b>${yen(v)}</b></div>`).join(''):'<div class="empty">まだ支出がありません</div>';
  let opts=['<option value="all">全カテゴリ</option>'];[...new Set(data.map(x=>x.category))].sort().forEach(x=>opts.push(`<option>${esc(x)}</option>`));let old=$('filter').value;$('filter').innerHTML=opts.join('');if([...$('filter').options].some(o=>o.value===old))$('filter').value=old;
  let list=data.slice().sort((a,b)=>b.date.localeCompare(a.date));if($('period').value==='month')list=list.filter(x=>x.date.slice(0,7)===ym);if($('filter').value!=='all')list=list.filter(x=>x.category===$('filter').value);
- $('historyList').innerHTML=list.length?list.map(x=>`<div class="item"><div><b>${esc(x.note||x.category)}</b><div class="meta">${x.date} ・ ${esc(x.category)}</div></div><div><span class="amount ${x.type==='income'?'green':'red'}">${x.type==='income'?'+':'-'}${yen(x.amount)}</span><button class="btn" onclick="editItem('${x.id}')">編集</button><button class="btn danger" onclick="del('${x.id}')">削除</button></div></div>`).join(''):'<div class="empty">記録がありません</div>';
+ $('historyList').innerHTML=list.length?list.map(x=>`<div class="item"><div><b>${esc(x.note||x.category)}</b><div class="meta">${x.date} ・ ${esc(x.category)}</div></div><div class="history-actions"><span class="amount ${x.type==='income'?'green':'red'}">${x.type==='income'?'+':'-'}${yen(x.amount)}</span><button class="btn" onclick="editItem('${x.id}')">編集</button><button class="btn danger" onclick="del('${x.id}')">削除</button></div></div>`).join(''):'<div class="empty">記録がありません</div>';
  let monthAssets=assets.filter(x=>x.month===assetMonth);
 let total=monthAssets.reduce((s,x)=>s+x.amount,0);
+let latestMonth=assets.map(x=>x.month).sort().slice(-1)[0];
+let latestItems=latestMonth?assets.filter(x=>x.month===latestMonth):[];
+let latestTotal=latestItems.reduce((s,x)=>s+x.amount,0);
 let [ay,am]=assetMonth.split('-');$('assetMonthLabel').textContent=ay+'年'+Number(am)+'月の資産合計';$('assetTotal').textContent=yen(total);
+$('assetLatestLabel').textContent=latestMonth?latestMonth.replace('-','年')+'月時点の総資産':'最新の総資産';
+$('assetLatestTotal').textContent=yen(latestTotal);
 $('assetList').innerHTML=monthAssets.length?monthAssets.map(x=>`<div class="item"><b>${esc(x.name)}</b><div><span class="amount">${yen(x.amount)}</span><button class="btn" onclick="editAsset('${x.id}')">編集</button><button class="btn danger" onclick="delAsset('${x.id}')">削除</button></div></div>`).join(''):'<div class="empty">この月の資産を登録してください</div>';
 let months=[...new Set(assets.map(x=>x.month))].sort();
 if(!months.includes(assetMonth)) months.push(assetMonth);
