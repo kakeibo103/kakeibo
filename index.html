@@ -362,9 +362,14 @@ function renderPie(){
  $('pieChart').style.background='conic-gradient('+stops.join(',')+')';
  $('pieLegend').innerHTML=entries.slice(0,7).map(([k,v],i)=>'<div class="legend-row"><i class="legend-color" style="background:'+chartPalette(i)+'"></i><span>'+esc(k)+' '+Math.round(v/total*1000)/10+'%</span><b>'+yen(v)+'</b></div>').join('')+(entries.length>7?'<div class="small">その他 '+yen(entries.slice(7).reduce((s,x)=>s+x[1],0))+'</div>':'');
 }
+function assetAsOfTotal(month){
+ const latestByName={};
+ assets.filter(x=>x.month && x.month<=month).slice().sort((a,b)=>a.month.localeCompare(b.month)||String(a.id).localeCompare(String(b.id))).forEach(x=>{latestByName[x.name]=Number(x.amount||0);});
+ return Object.values(latestByName).reduce((s,v)=>s+v,0);
+}
 function renderAssetChart(){
- const months=[...new Set(assets.map(x=>x.month))].sort(); if(!months.length){$('assetTrend').innerHTML='<div class="empty">まだ資産履歴がありません</div>';return;}
- const vals=months.map(m=>assets.filter(x=>x.month===m).reduce((s,x)=>s+x.amount,0)); const W=500,H=190,p=30,max=Math.max(...vals,1),min=Math.min(...vals,0); const range=max-min||1;
+ const months=[...new Set(assets.map(x=>x.month).filter(Boolean))].sort(); if(!months.length){$('assetTrend').innerHTML='<div class="empty">まだ資産履歴がありません</div>';return;}
+ const vals=months.map(m=>assetAsOfTotal(m)); const W=500,H=190,p=30,max=Math.max(...vals,1),min=Math.min(...vals,0); const range=max-min||1;
  const pts=vals.map((v,i)=>{const x=p+(months.length===1?0:(W-2*p)*i/(months.length-1));const y=H-p-(H-2*p)*(v-min)/range;return [x,y,v];});
  const path=pts.map((q,i)=>(i?'L':'M')+q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' ');
  const dots=pts.map(q=>'<circle cx="'+q[0]+'" cy="'+q[1]+'" r="4" fill="var(--theme)"/><text x="'+q[0]+'" y="'+(q[1]-9)+'" text-anchor="middle">'+yen(q[2])+'</text>').join('');
@@ -394,12 +399,11 @@ function render(){
 let total=monthAssets.reduce((s,x)=>s+Number(x.amount||0),0);
 let recordedMonths=[...new Set(assets.map(x=>x.month).filter(Boolean))].sort();
 let latestMonth=recordedMonths.length?recordedMonths[recordedMonths.length-1]:null;
-let latestItems=latestMonth?assets.filter(x=>x.month===latestMonth):[];
-let latestTotal=latestItems.reduce((s,x)=>s+Number(x.amount||0),0);
+let latestTotal=latestMonth?assetAsOfTotal(latestMonth):0;
 let [ay,am]=assetMonth.split('-');
 $('assetMonthLabel').textContent=ay+'年'+Number(am)+'月の資産合計';
 $('assetTotal').textContent=yen(total);
-$('assetLatestLabel').textContent=latestMonth?latestMonth.replace('-','年')+'月の総資産':'総資産';
+$('assetLatestLabel').textContent=latestMonth?latestMonth.replace('-','年')+'月時点の総資産':'総資産';
 $('assetLatestTotal').textContent=yen(latestTotal);
 $('assetList').innerHTML=monthAssets.length?monthAssets.map(x=>`<div class="item"><b>${esc(x.name)}</b><div><span class="amount">${yen(x.amount)}</span><button class="btn" onclick="editAsset('${x.id}')">編集</button><button class="btn danger" onclick="delAsset('${x.id}')">削除</button></div></div>`).join(''):'<div class="empty">この月の資産を登録してください</div>';
 let months=[...new Set(assets.map(x=>x.month))].sort();
