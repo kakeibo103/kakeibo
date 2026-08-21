@@ -155,7 +155,8 @@ const $=id=>document.getElementById(id), yen=n=>'¥'+Number(n).toLocaleString('j
 const compactYen=n=>{n=Number(n);const s=n<0?'−':'+';const a=Math.abs(n);if(a>=1000000)return s+'¥'+(a/1000000).toFixed(1).replace('.0','')+'万';if(a>=10000)return s+'¥'+(a/10000).toFixed(1).replace('.0','')+'万';return s+'¥'+a.toLocaleString('ja-JP');};
 const now=new Date(), ym=now.toISOString().slice(0,7);
 let data=JSON.parse(localStorage.getItem(DATA)||'[]'),assets=JSON.parse(localStorage.getItem(ASSET)||'[]');
-let assetMonth=ym;
+const initialAssetMonths=assets.map(x=>x.month).filter(Boolean).sort();
+let assetMonth=initialAssetMonths.length?initialAssetMonths[initialAssetMonths.length-1]:ym;
 let calendarMonth=ym;
 let selectedDay=null;
 let chartType='expense';
@@ -332,22 +333,67 @@ function backupData(){
  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 function restoreData(event){
- const file=event.target.files&&event.target.files[0];if(!file)return;
+ const file=event.target.files&&event.target.files[0];
+ if(!file)return;
  const reader=new FileReader();
  reader.onload=function(){
   try{
    const p=JSON.parse(reader.result);
-   if(!p||!Array.isArray(p.data)||!Array.isArray(p.assets))throw new Error();
+   if(!p || typeof p!=='object') throw new Error('JSON形式ではありません');
+   if(!Array.isArray(p.data)) throw new Error('dataが見つかりません');
+   if(!Array.isArray(p.assets)) throw new Error('assetsが見つかりません');
+
+   const restoredData=p.data.map(x=>({
+     id:String(x.id ?? Date.now()),
+     type:x.type==='income'?'income':'expense',
+     amount:Number(x.amount)||0,
+     category:String(x.category ?? 'その他'),
+     date:String(x.date ?? ''),
+     note:String(x.note ?? '')
+   })).filter(x=>/^\\d{4}-\\d{2}-\\d{2}$/.test(x.date));
+
+   const restoredAssets=p.assets.map(x=>({
+     id:String(x.id ?? Date.now()),
+     month:String(x.month ?? ''),
+     name:String(x.name ?? '資産'),
+     amount:Number(x.amount)||0
+   })).filter(x=>/^\\d{4}-\\d{2}$/.test(x.month) && x.name);
+
+   const restoredCategories=Array.isArray(p.categories)&&p.categories.length
+     ? p.categories.map(x=>String(x)).filter(Boolean)
+     : categories;
+
    if(!confirm("現在の家計簿データを、このバックアップで置き換えます。よろしいですか？"))return;
-   data=p.data;assets=p.assets;
-   if(Array.isArray(p.categories)&&p.categories.length)categories=p.categories;
+
+   data=restoredData;
+   assets=restoredAssets;
+   categories=restoredCategories;
+
    localStorage.setItem(DATA,JSON.stringify(data));
    localStorage.setItem(ASSET,JSON.stringify(assets));
    localStorage.setItem(CATKEY,JSON.stringify(categories));
-   applyTheme(localStorage.getItem(THEMEKEY)||'#a8b99a');renderThemeButtons();renderCategories();render();renderCalendar();alert("データを復元しました。");
-  }catch(e){alert("バックアップファイルを読み込めませんでした。家計簿から作成したJSONファイルを選んでください。");}
-  finally{event.target.value="";}
+
+   const recordedMonths=assets.map(x=>x.month).filter(Boolean).sort();
+   assetMonth=recordedMonths.length ? recordedMonths[recordedMonths.length-1] : ym;
+   calendarMonth=ym;
+   selectedDay=null;
+
+   applyTheme(localStorage.getItem(THEMEKEY)||'#a8b99a');
+   renderThemeButtons();
+   renderCategories();
+   renderCalendar();
+   render();
+   renderCalendar();
+
+   alert("データを復元しました。\\n\\n資産："+assets.length+"件\\n家計簿："+data.length+"件");
+  }catch(e){
+   console.error('restoreData error:',e);
+   alert("バックアップを読み込めませんでした。\\n\\n"+(e.message||e));
+  }finally{
+   event.target.value="";
+  }
  };
+ reader.onerror=function(){alert("バックアップファイルを読み取れませんでした。");event.target.value="";};
  reader.readAsText(file);
 }
 
@@ -419,9 +465,7 @@ function render(){
  $('historyList').innerHTML=list.length?list.map(x=>`<div class="item"><div><b>${esc(x.note||x.category)}</b><div class="meta">${x.date} ・ ${esc(x.category)}</div></div><div class="history-actions"><span class="amount ${x.type==='income'?'green':'red'}">${x.type==='income'?'+':'-'}${yen(x.amount)}</span><button class="btn" onclick="editItem('${x.id}')">編集</button><button class="btn danger" onclick="del('${x.id}')">削除</button></div></div>`).join(''):'<div class="empty">記録がありません</div>';
  let monthAssets=assets.filter(x=>x.month===assetMonth);
 let total=monthAssets.reduce((s,x)=>s+Number(x.amount||0),0);
-let recordedMonths=[...new Set(assets.map(x=>x.month).filter(Boolean))].sort();
-let latestMonth=recordedMonths.length?recordedMonths[recordedMonths.length-1]:null;
-let latestTotal=latestMonth?assetAsOfTotal(latestMonth):0;
+let cumulativeTotal=cumulativeAssetTotal(assetMonth);
 let [ay,am]=assetMonth.split('-');
 $('assetMonthLabel').textContent=ay+'年'+Number(am)+'月の資産合計';
 $('assetTotal').textContent=yen(total);
@@ -434,6 +478,6 @@ months.sort();
 renderAssetChart();renderPie();
 }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
-renderCategories();render();renderCalendar();
+renderCategories();renderCalendar();render();renderCalendar();
 </script>
 </body></html>
