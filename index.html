@@ -364,7 +364,7 @@ function renderPie(){
 }
 function assetAsOfTotal(month){
  const latestByName={};
- assets.filter(x=>x.month && x.month<=month).slice().sort((a,b)=>a.month.localeCompare(b.month)||String(a.id).localeCompare(String(b.id))).forEach(x=>{latestByName[x.name]=Number(x.amount||0);});
+ assets.filter(x=>x.month && x.month<=month).slice().sort((a,b)=>a.month.localeCompare(a.month)||String(b.id).localeCompare(String(a.id))).forEach(x=>{latestByName[x.name]=Number(x.amount||0);});
  return Object.values(latestByName).reduce((s,v)=>s+v,0);
 }
 function renderAssetChart(){
