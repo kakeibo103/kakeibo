@@ -363,9 +363,21 @@ function renderPie(){
  $('pieLegend').innerHTML=entries.slice(0,7).map(([k,v],i)=>'<div class="legend-row"><i class="legend-color" style="background:'+chartPalette(i)+'"></i><span>'+esc(k)+' '+Math.round(v/total*1000)/10+'%</span><b>'+yen(v)+'</b></div>').join('')+(entries.length>7?'<div class="small">その他 '+yen(entries.slice(7).reduce((s,x)=>s+x[1],0))+'</div>':'');
 }
 function assetAsOfTotal(month){
- const latestByName={};
- assets.filter(x=>x.month && x.month<=month).slice().sort((a,b)=>a.month.localeCompare(a.month)||String(b.id).localeCompare(String(a.id))).forEach(x=>{latestByName[x.name]=Number(x.amount||0);});
- return Object.values(latestByName).reduce((s,v)=>s+v,0);
+  const latestByName = {};
+
+  assets
+    .filter(x => x.month && x.month <= month)
+    .sort((a,b) => {
+      const m = a.month.localeCompare(b.month);
+      if (m !== 0) return m;
+      return Number(a.id || 0) - Number(b.id || 0);
+    })
+    .forEach(x => {
+      latestByName[x.name] = Number(x.amount) || 0;
+    });
+
+  return Object.values(latestByName)
+    .reduce((sum, amount) => sum + amount, 0);
 }
 function renderAssetChart(){
  const months=[...new Set(assets.map(x=>x.month).filter(Boolean))].sort(); if(!months.length){$('assetTrend').innerHTML='<div class="empty">まだ資産履歴がありません</div>';return;}
