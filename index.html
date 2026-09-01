@@ -29,13 +29,18 @@
 <header><div class="head-title"><h1>スマート家計簿</h1><div class="sub" id="headerSub"></div></div><button class="gear" onclick="show('settings')" aria-label="設定">⚙</button></header>
 <main>
 <section id="home" class="screen active">
+<div class="calendar-head">
+<button class="month-btn" onclick="changeHomeMonth(-1)">‹ 前月</button>
+<div class="calendar-title" id="homeMonthLabel"></div>
+<button class="month-btn" onclick="changeHomeMonth(1)">翌月 ›</button>
+</div>
 <div class="summary">
-<div class="card"><div class="label">今月の収入</div><div class="value green" id="income">¥0</div></div>
-<div class="card"><div class="label">今月の支出</div><div class="value red" id="expense">¥0</div></div>
-<div class="card balance"><div class="label">今月の残り</div><div class="value blue" id="balance">¥0</div></div>
+<div class="card"><div class="label" id="incomeLabel">今月の収入</div><div class="value green" id="income">¥0</div></div>
+<div class="card"><div class="label" id="expenseLabel">今月の支出</div><div class="value red" id="expense">¥0</div></div>
+<div class="card balance"><div class="label" id="balanceLabel">今月の残り</div><div class="value blue" id="balance">¥0</div></div>
 </div>
 <h2>支出の内訳</h2><div class="card" id="homeCats"></div>
-<h2>今月の支出割合</h2><div class="card"><div class="chart-toggle"><button class="btn active" id="expenseChartBtn" onclick="setChartType('expense')">支出</button><button class="btn" id="incomeChartBtn" onclick="setChartType('income')">収入</button></div><div class="chart-wrap"><div class="pie" id="pieChart"></div><div class="legend-list" id="pieLegend"></div></div></div>
+<h2 id="homeChartTitle">今月の支出割合</h2><div class="card"><div class="chart-toggle"><button class="btn active" id="expenseChartBtn" onclick="setChartType('expense')">支出</button><button class="btn" id="incomeChartBtn" onclick="setChartType('income')">収入</button></div><div class="chart-wrap"><div class="pie" id="pieChart"></div><div class="legend-list" id="pieLegend"></div></div></div>
 <button class="btn primary" onclick="show('input')">＋ 支出を入力</button>
 </section>
 
@@ -72,7 +77,16 @@
 </section>
 
 <section id="history" class="screen">
-<h2>履歴</h2><div class="grid"><select id="period" onchange="render()"><option value="month">今月</option><option value="all">すべて</option></select><select id="filter" onchange="render()"><option value="all">全カテゴリ</option></select></div>
+<h2>履歴</h2>
+<div class="calendar-head">
+<button class="month-btn" onclick="changeHistoryMonth(-1)">‹ 前月</button>
+<div class="calendar-title" id="historyMonthLabel"></div>
+<button class="month-btn" onclick="changeHistoryMonth(1)">翌月 ›</button>
+</div>
+<div class="grid">
+<select id="period" onchange="render()"><option value="month">選択中の月</option><option value="current">今月</option><option value="all">すべて</option></select>
+<select id="filter" onchange="render()"><option value="all">全カテゴリ</option></select>
+</div>
 <div class="card" style="margin-top:10px" id="historyList"></div>
 </section>
 
@@ -158,11 +172,24 @@ let data=JSON.parse(localStorage.getItem(DATA)||'[]'),assets=JSON.parse(localSto
 const initialAssetMonths=assets.map(x=>x.month).filter(Boolean).sort();
 let assetMonth=initialAssetMonths.length?initialAssetMonths[initialAssetMonths.length-1]:ym;
 let calendarMonth=ym;
+let homeMonth=ym;
+let historyMonth=ym;
 let selectedDay=null;
 let chartType='expense';
 const THEMEKEY='kakeibo_theme';
 $('date').value=now.toISOString().slice(0,10);
-function current(){return data.filter(x=>x.date.slice(0,7)===ym)}
+function monthLabel(month){
+ const [y,m]=month.split('-');
+ return y+'年'+Number(m)+'月';
+}
+function shiftMonth(month,delta){
+ const [y,m]=month.split('-').map(Number);
+ const d=new Date(y,m-1+delta,1);
+ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function current(month=homeMonth){return data.filter(x=>x.date.slice(0,7)===month)}
+function changeHomeMonth(delta){homeMonth=shiftMonth(homeMonth,delta);render();}
+function changeHistoryMonth(delta){historyMonth=shiftMonth(historyMonth,delta);render();}
 function show(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.s===id));render();if(id==='calendar')renderCalendar();if(id==='settings')renderThemeButtons()}
 
 const CATKEY='kakeibo_v2_categories';
@@ -400,7 +427,7 @@ function restoreData(event){
 function setChartType(type){chartType=type;renderPie();}
 function chartPalette(i){const palettes=['#6f8c6a','#d39a64','#d06c67','#8e77b6','#5f9da8','#b9a34b','#8d6f58','#9a8e9e','#6c86a5','#c77b9b'];return palettes[i%palettes.length]}
 function renderPie(){
- const c=current(), map={}; c.filter(x=>x.type===chartType).forEach(x=>map[x.category]=(map[x.category]||0)+x.amount);
+ const c=current(homeMonth), map={}; c.filter(x=>x.type===chartType).forEach(x=>map[x.category]=(map[x.category]||0)+x.amount);
  const entries=Object.entries(map).sort((a,b)=>b[1]-a[1]); const total=entries.reduce((s,x)=>s+x[1],0);
  $('expenseChartBtn').classList.toggle('active',chartType==='expense');$('incomeChartBtn').classList.toggle('active',chartType==='income');
  if(!entries.length){$('pieChart').style.background='#e6e2d8';$('pieLegend').innerHTML='<div class="empty" style="padding:15px">まだ'+(chartType==='expense'?'支出':'収入')+'がありません</div>';return;}
@@ -455,13 +482,22 @@ function mix(a,b,t){const A=[parseInt(a.slice(1,3),16),parseInt(a.slice(3,5),16)
 function renderThemeButtons(){const c=localStorage.getItem(THEMEKEY)||'#a8b99a';document.querySelectorAll('.swatch').forEach(x=>x.classList.toggle('active',x.dataset.color.toLowerCase()===c.toLowerCase()));if($('customTheme'))$('customTheme').value=c;}
 
 function render(){
- let c=current(),inc=c.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0),exp=c.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
- $('headerSub').textContent=now.getFullYear()+'年'+(now.getMonth()+1)+'月';
+ let c=current(homeMonth),inc=c.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0),exp=c.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
+ $('headerSub').textContent=monthLabel(homeMonth);
+ $('homeMonthLabel').textContent=monthLabel(homeMonth);
+ $('incomeLabel').textContent=monthLabel(homeMonth)+'の収入';
+ $('expenseLabel').textContent=monthLabel(homeMonth)+'の支出';
+ $('balanceLabel').textContent=monthLabel(homeMonth)+'の収支';
+ $('homeChartTitle').textContent=monthLabel(homeMonth)+'の支出割合';
  $('income').textContent=yen(inc);$('expense').textContent=yen(exp);$('balance').textContent=yen(inc-exp);
  let cats={};c.filter(x=>x.type==='expense').forEach(x=>cats[x.category]=(cats[x.category]||0)+x.amount);
  let entries=Object.entries(cats).sort((a,b)=>b[1]-a[1]);$('homeCats').innerHTML=entries.length?entries.map(([k,v])=>`<div class="cat"><span>${esc(k)}</span><b>${yen(v)}</b></div>`).join(''):'<div class="empty">まだ支出がありません</div>';
  let opts=['<option value="all">全カテゴリ</option>'];[...new Set(data.map(x=>x.category))].sort().forEach(x=>opts.push(`<option>${esc(x)}</option>`));let old=$('filter').value;$('filter').innerHTML=opts.join('');if([...$('filter').options].some(o=>o.value===old))$('filter').value=old;
- let list=data.slice().sort((a,b)=>b.date.localeCompare(a.date));if($('period').value==='month')list=list.filter(x=>x.date.slice(0,7)===ym);if($('filter').value!=='all')list=list.filter(x=>x.category===$('filter').value);
+ $('historyMonthLabel').textContent=monthLabel(historyMonth);
+ let list=data.slice().sort((a,b)=>b.date.localeCompare(a.date));
+ if($('period').value==='month')list=list.filter(x=>x.date.slice(0,7)===historyMonth);
+ if($('period').value==='current')list=list.filter(x=>x.date.slice(0,7)===ym);
+ if($('filter').value!=='all')list=list.filter(x=>x.category===$('filter').value);
  $('historyList').innerHTML=list.length?list.map(x=>`<div class="item"><div><b>${esc(x.note||x.category)}</b><div class="meta">${x.date} ・ ${esc(x.category)}</div></div><div class="history-actions"><span class="amount ${x.type==='income'?'green':'red'}">${x.type==='income'?'+':'-'}${yen(x.amount)}</span><button class="btn" onclick="editItem('${x.id}')">編集</button><button class="btn danger" onclick="del('${x.id}')">削除</button></div></div>`).join(''):'<div class="empty">記録がありません</div>';
  let monthAssets=assets.filter(x=>x.month===assetMonth);
 let total=monthAssets.reduce((s,x)=>s+Number(x.amount||0),0);
